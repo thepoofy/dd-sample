@@ -9,8 +9,5 @@ import dagger.Provides
 class PicassoModule {
 
     @Provides
-    fun picasso(context: Context): Picasso = Picasso.Builder(context)
-        .indicatorsEnabled(BuildConfig.DEBUG)
-        .loggingEnabled(BuildConfig.DEBUG)
-        .build()
+    fun picasso(context: Context): Picasso = Picasso.Builder(context).build()
 }
