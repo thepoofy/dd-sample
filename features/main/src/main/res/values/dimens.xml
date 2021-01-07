@@ -1,5 +1,5 @@
 <resources>
-    <dimen name="content_margin">16dp</dimen>
+    <dimen name="content_margin">8dp</dimen>
 
     <dimen name="restaurant_image_width">100dp</dimen>
     <dimen name="restaurant_image_height">50dp</dimen>
