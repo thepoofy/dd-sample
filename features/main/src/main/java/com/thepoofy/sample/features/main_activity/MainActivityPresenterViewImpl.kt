@@ -5,6 +5,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.thepoofy.sample.features.main_activity.databinding.ContentScrollingBinding
 import com.thepoofy.sample.features.main_activity.list.RestaurantListAdapter
 import com.thepoofy.sample.lib.api.model.Restaurant
+import io.reactivex.rxjava3.core.Observable
 import javax.inject.Inject
 
 class MainActivityPresenterViewImpl @Inject constructor(
@@ -58,6 +59,14 @@ class MainActivityPresenterViewImpl @Inject constructor(
 
     override fun hide() {
         setIsVisible(false)
+    }
+
+    override fun itemClicks(): Observable<Int> {
+        return restaurantListAdapter.itemClickEvents()
+    }
+
+    override fun scrollEvents(): Observable<Unit> {
+        return restaurantListAdapter.scrollEvents()
     }
 
     private fun setIsListVisible(isVisible: Boolean) {
