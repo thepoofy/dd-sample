@@ -4,6 +4,7 @@ import androidx.lifecycle.Lifecycle
 import autodispose2.ScopeProvider
 import autodispose2.autoDispose
 import com.thepoofy.sample.features.main_activity.databinding.ContentScrollingBinding
+import com.thepoofy.sample.lib.api.model.Restaurant
 import com.thepoofy.sample.lib.core.SchedulersModule
 import com.thepoofy.sample.lib.mvp.LifecyclePresenter
 import timber.log.Timber
@@ -18,6 +19,8 @@ class MainActivityPresenter @Inject constructor(
     private val repository: DataListRepository,
 ) : LifecyclePresenter<ContentScrollingBinding>() {
 
+    private var itemsLoaded = arrayListOf<Restaurant>()
+
     override fun onCreateView(binding: ContentScrollingBinding) {
         super.onCreateView(binding)
         view.onAttach(binding)
@@ -25,15 +28,30 @@ class MainActivityPresenter @Inject constructor(
     }
 
     override fun onResume() {
-        view.showLoading()
+        if (itemsLoaded.isEmpty()) {
+            view.showLoading()
+            requestRestaurants(INITIAL_OFFSET)
+        }
 
+        /*
+        Note to reviewer: I was adding infinite scroll for *bonus points* when I realized the offset
+        and limit parameters of the API are not functional. The api returns the same 50 results
+        every time and many of the Restaurant objects are duplicated.
+        The initial list loads and scrolls nicely (imo) but infinite scroll is commented out for the
+        stated reasons.
+         */
+//        subscribeScrollEvents()
+        subscribeClickEvents()
+    }
+
+    private fun requestRestaurants(offset: Int) {
         locationProvider.getCurrentLocation()
             .take(1)
             .flatMapSingle {
                 repository.getRestaurants(
                     it.first,
                     it.second,
-                    INITIAL_OFFSET,
+                    offset,
                     OFFSET_INCREMENT
                 )
             }
@@ -42,13 +60,42 @@ class MainActivityPresenter @Inject constructor(
             .autoDispose(scopeProvider)
             .subscribe({
                 view.hideLoading()
-                if (it.isNotEmpty()) {
-                    view.update(it)
-                } else {
+
+                if (it.isEmpty() && itemsLoaded.isEmpty()) {
                     view.showEmptyList()
+                } else if (it.isNotEmpty()) {
+                    itemsLoaded.addAll(it)
+                    view.update(itemsLoaded)
                 }
             }, {
                 view.hideLoading()
+                Timber.w(it)
+                view.showError()
+            })
+    }
+
+    private fun subscribeScrollEvents() {
+        view.scrollEvents()
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.mainThread())
+            .autoDispose(scopeProvider)
+            .subscribe({
+                Timber.i("Scroll Event Captured")
+                requestRestaurants(itemsLoaded.size)
+            }, {
+                Timber.w(it)
+                view.showError()
+            })
+    }
+
+    private fun subscribeClickEvents() {
+        view.itemClicks()
+            .subscribeOn(schedulers.mainThread())
+            .observeOn(schedulers.mainThread())
+            .autoDispose(scopeProvider)
+            .subscribe({
+                Timber.d("Item clicked $it")
+            }, {
                 Timber.w(it)
                 view.showError()
             })

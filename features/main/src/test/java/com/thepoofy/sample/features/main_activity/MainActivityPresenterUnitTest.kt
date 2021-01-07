@@ -38,19 +38,36 @@ class MainActivityPresenterUnitTest {
     private lateinit var presenter: MainActivityPresenter
 
     @Test
-    fun onResume_usesLocationProvider() {
+    fun onResume_whenLocationProviderError_showsErrorMessage() {
         // given
-        val lat = 1.22345f
-        val lng = 44.234f
-        `when`(locationProvider.getCurrentLocation()).thenReturn(Observable.just(Pair(lat, lng)))
-        val data: ArrayList<Restaurant> = arrayListOf(createData())
-        `when`(repository.getRestaurants(eq(lat), eq(lng), anyInt(), anyInt()))
-            .thenReturn(Single.just(data))
+        whenClickEvent_doNothing()
+        `when`(locationProvider.getCurrentLocation()).thenReturn(Observable.error(RuntimeException()))
 
         // when
         presenter.onResume()
 
         // then
+        verify(view).showLoading()
+        verify(view).showError()
+        verify(view, never()).update(anyListOf(Restaurant::class.java))
+    }
+
+    @Test
+    fun onResume_whenUsingLocationProvider_verifyLatLngUsed() {
+        // given
+        val lat = 1.22345f
+        val lng = 44.234f
+        `when`(locationProvider.getCurrentLocation()).thenReturn(Observable.just(Pair(lat, lng)))
+        val data: ArrayList<Restaurant> = arrayListOf(createData())
+        `when`(repository.getRestaurants(anyFloat(), anyFloat(), anyInt(), anyInt()))
+            .thenReturn(Single.just(data))
+        whenClickEvent_doNothing()
+
+        // when
+        presenter.onResume()
+
+        // then
+        verify(repository).getRestaurants(eq(lat), eq(lng), anyInt(), anyInt())
         verify(view).showLoading()
         verify(view).update(data)
         verify(view).hideLoading()
@@ -62,6 +79,7 @@ class MainActivityPresenterUnitTest {
     @Test
     fun onResume_loadsData() {
         // given
+        whenClickEvent_doNothing()
         whenLocationProvided()
         val data: ArrayList<Restaurant> = arrayListOf(createData())
         `when`(repository.getRestaurants(anyFloat(), anyFloat(), anyInt(), anyInt()))
@@ -82,6 +100,7 @@ class MainActivityPresenterUnitTest {
     @Test
     fun onResume_whenError_showsErrorMessage() {
         // given
+        whenClickEvent_doNothing()
         whenLocationProvided()
         `when`(repository.getRestaurants(anyFloat(), anyFloat(), anyInt(), anyInt()))
             .thenReturn(Single.error(RuntimeException()))
@@ -99,6 +118,7 @@ class MainActivityPresenterUnitTest {
     fun onResume_whenEmpty_showsEmptyMessage() {
         // given
         whenLocationProvided()
+        whenClickEvent_doNothing()
         `when`(repository.getRestaurants(anyFloat(), anyFloat(), anyInt(), anyInt()))
             .thenReturn(Single.just(emptyList()))
 
@@ -143,5 +163,9 @@ class MainActivityPresenterUnitTest {
 
     private fun whenLocationProvided() {
         `when`(locationProvider.getCurrentLocation()).thenReturn(Observable.just(Pair(1.0f, 1.0f)))
+    }
+
+    private fun whenClickEvent_doNothing() {
+        `when`(view.itemClicks()).thenReturn(Observable.never())
     }
 }
