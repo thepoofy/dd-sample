@@ -1,0 +1,27 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
+dependencies {
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "$androidx_core_ktx"
+    implementation "$androidx_appcompat"
+    implementation "$material_design"
+
+    implementation "$okhttp3"
+    implementation "$okhttp3_interceptor"
+    implementation "$retrofit"
+    implementation "$retrofit_rxjava3"
+    implementation "$retrofit_moshi"
+    implementation "$moshi"
+    kapt "$moshi_codegen"
+
+    implementation "$dagger2"
+    kapt "$dagger2_compiler"
+
+    testImplementation "$junit"
+    androidTestImplementation "$androidx_junit"
+}

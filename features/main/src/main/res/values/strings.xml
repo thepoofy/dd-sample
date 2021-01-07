@@ -1,0 +1,4 @@
+<resources>
+    <string name="main_activity_list_empty_label">No data found.</string>
+    <string name="main_activity_list_error_label">Data not available.</string>
+</resources>

@@ -1,0 +1,22 @@
+Build Tools:  Build tools: 30.0.2, Android Studio 4.1
+Focus Areas:  Application structure and organization.
+Copied in Code, of my own writing:
+ - LifecyclePresenter, PresenterView
+    These are my simple MVP framework that works with Lifecycle and makes applications easier to compose.
+ - dependencies.gradle
+    Copied in from a side project under active development so I could be sure these were up to date.
+ - build.gradle (project)
+    `subprojects` block is not of my own design, but makes adding many modules to a project easier.
+
+Focus: designed for a phone
+Time spent: 6 1/3 hours
+ - 4.5 hours to functional app, then another hour plus to write tests for the presenter.
+
+
+Notes about application structure:
+    The general structure of app and core modules is something I've used repeatedly in projects in the last few months.
+This organizes the top of my dependency graph.
+The contents of the dependency graph in this project is completely novel to this project.
+
+Most dependencies used to build this project are square products themselves.  What notably isn't: Dagger2, RxJava3, AutoDispose
+

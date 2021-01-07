@@ -1,0 +1,24 @@
+plugins {
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
+dependencies {
+    implementation project(':features:main')
+    implementation project(":lib:core")
+    implementation project(":lib:ui")
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "$androidx_core_ktx"
+    implementation "$androidx_appcompat"
+    implementation "$material_design"
+
+    implementation "$dagger2"
+    kapt "$dagger2_compiler"
+
+    implementation "$timber"
+
+    testImplementation "$junit"
+    androidTestImplementation "$androidx_junit"
+}
