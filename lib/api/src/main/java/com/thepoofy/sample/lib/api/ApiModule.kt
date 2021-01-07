@@ -22,17 +22,17 @@ class ApiModule {
     fun sampleApi(
         adapterFactory: RxJava3CallAdapterFactory,
         moshi: Moshi,
-    ): SampleApi {
+    ): DoorDashApi {
         val httpClient = OkHttpClient.Builder().build()
 
         val converterFactory = MoshiConverterFactory.create(moshi)
 
         return Retrofit.Builder()
-            .baseUrl(SampleApi.API_ROOT)
+            .baseUrl(DoorDashApi.API_ROOT)
             .addConverterFactory(converterFactory)
             .addCallAdapterFactory(adapterFactory)
             .client(httpClient)
             .build()
-            .create(SampleApi::class.java)
+            .create(DoorDashApi::class.java)
     }
 }
