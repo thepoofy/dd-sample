@@ -1,9 +1,8 @@
 package com.thepoofy.sample.lib.mvp
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
+import androidx.viewbinding.ViewBinding
 
-interface PresenterView {
+interface PresenterView<VB : ViewBinding> {
 
-    fun onAttach(layoutInflater: LayoutInflater, viewGroup: ViewGroup)
+    fun onAttach(binding: VB)
 }
