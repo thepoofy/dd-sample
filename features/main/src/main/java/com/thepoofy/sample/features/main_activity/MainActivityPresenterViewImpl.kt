@@ -1,68 +1,55 @@
 package com.thepoofy.sample.features.main_activity
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
-import android.widget.ProgressBar
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.snackbar.Snackbar
-import com.thepoofy.sample.features.main_activity.list.StringListAdapter
+import com.thepoofy.sample.features.main_activity.databinding.ContentScrollingBinding
+import com.thepoofy.sample.features.main_activity.list.RestaurantListAdapter
+import com.thepoofy.sample.lib.api.model.Restaurant
 import javax.inject.Inject
 
 class MainActivityPresenterViewImpl @Inject constructor(
-    private val stringListAdapter: StringListAdapter
+    private val restaurantListAdapter: RestaurantListAdapter
 ) : MainActivityView {
 
-    private lateinit var container: ViewGroup
-    private lateinit var loadingView: ProgressBar
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var binding: ContentScrollingBinding
     private lateinit var snackbar: Snackbar
-    private lateinit var emptyGroup: ViewGroup
 
-    override fun onAttach(layoutInflater: LayoutInflater, viewGroup: ViewGroup) {
-        container = viewGroup.findViewById(R.id.scrolling_container)
-        viewGroup.findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title =
-            viewGroup.resources.getString(R.string.app_name)
+    override fun onAttach(binding: ContentScrollingBinding) {
+        this.binding = binding
+        initView()
+    }
 
-        recyclerView = viewGroup.findViewById(R.id.main_activity_list_recyclerview)
-        recyclerView.adapter = stringListAdapter
+    private fun initView() {
+        binding.recyclerview.adapter = restaurantListAdapter
 
-        loadingView = viewGroup.findViewById(R.id.main_activity_list_loading)
         snackbar = Snackbar.make(
-            viewGroup,
+            binding.root,
             R.string.main_activity_list_error_label,
             Snackbar.LENGTH_LONG
         )
-
-        emptyGroup = viewGroup.findViewById(R.id.main_activity_list_empty_group)
     }
 
     override fun showLoading() {
-        container.isVisible = true
+        setIsVisible(true)
+        binding.recyclerview.isVisible = false
+        binding.emptyGroup.isVisible = false
 
-        recyclerView.isVisible = false
-        emptyGroup.isVisible = false
-
-        loadingView.isVisible = true
+        binding.loading.isVisible = true
     }
 
     override fun hideLoading() {
-        loadingView.isVisible = false
+        binding.loading.isVisible = false
     }
 
-    override fun update(data: List<String>) {
-        container.isVisible = true
-        emptyGroup.isVisible = false
-
-        recyclerView.isVisible = true
-        stringListAdapter.update(data)
+    override fun update(data: List<Restaurant>) {
+        setIsVisible(true)
+        setIsListVisible(true)
+        restaurantListAdapter.update(data)
     }
 
     override fun showEmptyList() {
-        recyclerView.isVisible = false
-
-        emptyGroup.isVisible = true
+        setIsVisible(true)
+        setIsListVisible(false)
     }
 
     override fun showError() {
@@ -70,6 +57,15 @@ class MainActivityPresenterViewImpl @Inject constructor(
     }
 
     override fun hide() {
-        container.isVisible = false
+        setIsVisible(false)
+    }
+
+    private fun setIsListVisible(isVisible: Boolean) {
+        binding.recyclerview.isVisible = isVisible
+        binding.emptyGroup.isVisible = !isVisible
+    }
+
+    private fun setIsVisible(isVisible: Boolean) {
+        binding.root.isVisible = isVisible
     }
 }

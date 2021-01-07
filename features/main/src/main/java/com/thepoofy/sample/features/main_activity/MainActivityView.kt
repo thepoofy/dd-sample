@@ -1,11 +1,13 @@
 package com.thepoofy.sample.features.main_activity
 
+import com.thepoofy.sample.features.main_activity.databinding.ContentScrollingBinding
+import com.thepoofy.sample.lib.api.model.Restaurant
 import com.thepoofy.sample.lib.mvp.LoadingView
 import com.thepoofy.sample.lib.mvp.PresenterView
 
-interface MainActivityView : LoadingView, PresenterView {
+interface MainActivityView : LoadingView, PresenterView<ContentScrollingBinding> {
 
-    fun update(data: List<String>)
+    fun update(data: List<Restaurant>)
 
     fun showEmptyList()
 

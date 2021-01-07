@@ -1,10 +1,9 @@
 <resources>
-    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="content_margin">16dp</dimen>
 
-    <dimen name="content_margin">8dp</dimen>
+    <dimen name="restaurant_image_width">100dp</dimen>
+    <dimen name="restaurant_image_height">50dp</dimen>
 
-    <dimen name="employee_badge_small">72dp</dimen>
-    <dimen name="employee_badge_large">144dp</dimen>
     <dimen name="loading_icon">90dp</dimen>
     <dimen name="warning_icon">90dp</dimen>
     <dimen name="text_padding">4dp</dimen>

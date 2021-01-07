@@ -2,6 +2,7 @@ package com.thepoofy.sample.features.main_activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.thepoofy.sample.features.main_activity.databinding.ActivityScrollingBinding
 import com.thepoofy.sample.lib.core.CoreComponentProvider
 import javax.inject.Inject
 
@@ -12,16 +13,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scrolling)
-        setSupportActionBar(findViewById(R.id.toolbar))
+        val binding = ActivityScrollingBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        DaggerMainActivityComponent.builder()
-            .coreComponent((application as? CoreComponentProvider)?.provideCoreComponent())
-            .module(MainActivityComponent.Module(this))
-            .build()
+        DaggerMainActivityComponent.factory()
+            .create((application as? CoreComponentProvider)?.provideCoreComponent()!!, this)
             .inject(this)
 
-        presenter.onCreateView(layoutInflater, findViewById(R.id.activity_scrolling_root))
+        presenter.onCreateView(binding.scrollingContent)
     }
 
 }

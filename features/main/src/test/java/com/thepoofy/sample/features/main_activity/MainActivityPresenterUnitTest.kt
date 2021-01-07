@@ -1,10 +1,10 @@
 package com.thepoofy.sample.features.main_activity
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.lifecycle.Lifecycle
 import autodispose2.lifecycle.TestLifecycleScopeProvider
+import com.thepoofy.sample.lib.api.model.Restaurant
 import com.thepoofy.sample.lib.core.SchedulersModule
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Scheduler
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -27,6 +27,9 @@ class MainActivityPresenterUnitTest {
     lateinit var lifecycle: Lifecycle
 
     @Mock
+    lateinit var locationProvider: LocationProvider
+
+    @Mock
     lateinit var repository: DataListRepository
 
     @Mock
@@ -35,25 +38,34 @@ class MainActivityPresenterUnitTest {
     private lateinit var presenter: MainActivityPresenter
 
     @Test
-    fun onCreateView_attachesCorrectly() {
+    fun onResume_usesLocationProvider() {
         // given
-        val layoutInflater = mock(LayoutInflater::class.java)
-        val viewGroup = mock(ViewGroup::class.java)
-        verifyZeroInteractions(view, lifecycle)
+        val lat = 1.22345f
+        val lng = 44.234f
+        `when`(locationProvider.getCurrentLocation()).thenReturn(Observable.just(Pair(lat, lng)))
+        val data: ArrayList<Restaurant> = arrayListOf(createData())
+        `when`(repository.getRestaurants(eq(lat), eq(lng), anyInt(), anyInt()))
+            .thenReturn(Single.just(data))
 
         // when
-        presenter.onCreateView(layoutInflater, viewGroup)
+        presenter.onResume()
 
         // then
-        verify(view).onAttach(layoutInflater, viewGroup)
-        verify(lifecycle).addObserver(presenter)
+        verify(view).showLoading()
+        verify(view).update(data)
+        verify(view).hideLoading()
+
+        verify(view, never()).showError()
+        verify(view, never()).showEmptyList()
     }
 
     @Test
     fun onResume_loadsData() {
         // given
-        val data = arrayListOf(createData())
-        `when`(repository.getData()).thenReturn(Single.just(data))
+        whenLocationProvided()
+        val data: ArrayList<Restaurant> = arrayListOf(createData())
+        `when`(repository.getRestaurants(anyFloat(), anyFloat(), anyInt(), anyInt()))
+            .thenReturn(Single.just(data))
 
         // when
         presenter.onResume()
@@ -70,7 +82,9 @@ class MainActivityPresenterUnitTest {
     @Test
     fun onResume_whenError_showsErrorMessage() {
         // given
-        `when`(repository.getData()).thenReturn(Single.error(RuntimeException()))
+        whenLocationProvided()
+        `when`(repository.getRestaurants(anyFloat(), anyFloat(), anyInt(), anyInt()))
+            .thenReturn(Single.error(RuntimeException()))
 
         // when
         presenter.onResume()
@@ -78,13 +92,15 @@ class MainActivityPresenterUnitTest {
         // then
         verify(view).showLoading()
         verify(view).showError()
-        verify(view, never()).update(anyListOf(String::class.java))
+        verify(view, never()).update(anyListOf(Restaurant::class.java))
     }
 
     @Test
     fun onResume_whenEmpty_showsEmptyMessage() {
         // given
-        `when`(repository.getData()).thenReturn(Single.just(emptyList()))
+        whenLocationProvided()
+        `when`(repository.getRestaurants(anyFloat(), anyFloat(), anyInt(), anyInt()))
+            .thenReturn(Single.just(emptyList()))
 
         // when
         presenter.onResume()
@@ -93,7 +109,7 @@ class MainActivityPresenterUnitTest {
         verify(view).showLoading()
         verify(view).showEmptyList()
         verify(view, never()).showError()
-        verify(view, never()).update(anyListOf(String::class.java))
+        verify(view, never()).update(anyListOf(Restaurant::class.java))
     }
 
     @Before
@@ -101,6 +117,7 @@ class MainActivityPresenterUnitTest {
         val scopeProvider = TestLifecycleScopeProvider.create()
         presenter = MainActivityPresenter(
             lifecycle,
+            locationProvider,
             TestSchedulers(),
             scopeProvider,
             view,
@@ -118,10 +135,13 @@ class MainActivityPresenterUnitTest {
         override fun mainThread(): Scheduler {
             return Schedulers.trampoline()
         }
-
     }
 
-    private fun createData(): String {
-        return "asdf"
+    private fun createData(): Restaurant {
+        return Restaurant("image.png", 99, "Burgers", 1234, "GoodBurger", "Closed")
+    }
+
+    private fun whenLocationProvided() {
+        `when`(locationProvider.getCurrentLocation()).thenReturn(Observable.just(Pair(1.0f, 1.0f)))
     }
 }

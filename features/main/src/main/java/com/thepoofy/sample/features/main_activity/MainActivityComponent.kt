@@ -1,18 +1,17 @@
 package com.thepoofy.sample.features.main_activity
 
 import android.view.LayoutInflater
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import autodispose2.ScopeProvider
 import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider
-import com.squareup.moshi.Moshi
-import com.thepoofy.sample.features.main_activity.list.StringListAdapter
-import com.thepoofy.sample.features.main_activity.storage.FileStorage
+import com.thepoofy.sample.features.main_activity.list.RestaurantListAdapter
 import com.thepoofy.sample.lib.api.ApiModule
-import com.thepoofy.sample.lib.api.SampleApi
+import com.thepoofy.sample.lib.api.DoorDashApi
 import com.thepoofy.sample.lib.core.CoreComponent
+import dagger.BindsInstance
 import dagger.Component
 import dagger.Provides
+import io.reactivex.rxjava3.core.Observable
 
 @MainActivityScope
 @Component(
@@ -23,16 +22,24 @@ interface MainActivityComponent {
 
     fun inject(activity: MainActivity)
 
+    @Component.Factory
+    interface MainActivityComponentFactory {
+        fun create(
+            core: CoreComponent,
+            @BindsInstance activity: MainActivity
+        ): MainActivityComponent
+    }
+
     @dagger.Module
-    class Module(private val activity: AppCompatActivity) {
+    class Module {
 
         @Provides
         @MainActivityScope
-        fun layoutInflater(): LayoutInflater = activity.layoutInflater
+        fun layoutInflater(activity: MainActivity): LayoutInflater = activity.layoutInflater
 
         @Provides
         @MainActivityScope
-        fun lifecycle(): Lifecycle = activity.lifecycle
+        fun lifecycle(activity: MainActivity): Lifecycle = activity.lifecycle
 
         @Provides
         @MainActivityScope
@@ -41,16 +48,19 @@ interface MainActivityComponent {
 
         @Provides
         @MainActivityScope
-        fun fileStorage(moshi: Moshi) = FileStorage(activity, moshi)
+        fun repository(api: DoorDashApi): DataListRepository = DataListRepositoryImpl(api)
 
         @Provides
         @MainActivityScope
-        fun repository(api: SampleApi, fileStorage: FileStorage): DataListRepository =
-            DataListRepositoryImpl(api, fileStorage)
-
-        @Provides
-        @MainActivityScope
-        fun view(adapter: StringListAdapter): MainActivityView =
+        fun view(adapter: RestaurantListAdapter): MainActivityView =
             MainActivityPresenterViewImpl(adapter)
+
+        @Provides
+        @MainActivityScope
+        fun locationProvider(): LocationProvider = object : LocationProvider {
+            override fun getCurrentLocation(): Observable<Pair<Float, Float>> {
+                return Observable.just(Pair(37.422740f, -122.139956f))
+            }
+        }
     }
 }

@@ -2,7 +2,6 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/scrolling_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -10,7 +9,7 @@
     tools:showIn="@layout/activity_scrolling">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/main_activity_list_recyclerview"
+        android:id="@+id/recyclerview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
@@ -20,17 +19,17 @@
         tools:visibility="visible" />
 
     <ProgressBar
-        android:id="@+id/main_activity_list_loading"
+        android:id="@+id/loading"
         android:layout_width="@dimen/loading_icon"
         android:layout_height="@dimen/loading_icon"
         android:layout_gravity="center"
         tools:visibility="gone" />
 
     <LinearLayout
-        android:id="@+id/main_activity_list_empty_group"
+        android:id="@+id/empty_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/app_bar_height"
+
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:visibility="gone">
