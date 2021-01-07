@@ -29,6 +29,10 @@ subprojects {
                 compileSdkVersion 30
                 buildToolsVersion "30.0.2"
 
+                buildFeatures {
+                    viewBinding true
+                }
+
                 defaultConfig {
                     minSdkVersion 24
                     targetSdkVersion 30
