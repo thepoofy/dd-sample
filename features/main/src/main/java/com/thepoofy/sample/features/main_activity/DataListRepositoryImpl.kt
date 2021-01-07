@@ -14,6 +14,6 @@ class DataListRepositoryImpl constructor(
         offset: Int,
         limit: Int,
     ): Single<List<Restaurant>> {
-        return api.searchRestaurants(latitude, longitude, offset, limit)
+        return api.getRestaurants(latitude, longitude, offset, limit)
     }
 }
