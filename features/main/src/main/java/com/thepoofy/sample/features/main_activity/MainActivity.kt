@@ -9,7 +9,7 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity() {
 
     @Inject
-    lateinit var presenter: MainActivityPresenter
+    lateinit var presenter: NavigationPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
             .create((application as? CoreComponentProvider)?.provideCoreComponent()!!, this)
             .inject(this)
 
-        presenter.onCreateView(binding.scrollingContent)
+        presenter.onCreateView(binding)
     }
-
 }

@@ -16,6 +16,8 @@ interface MainActivityView : LoadingView, PresenterView<ContentScrollingBinding>
 
     fun hide()
 
+    fun show()
+
     fun scrollEvents(): Observable<Unit>
 
     fun itemClicks(): Observable<Int>

@@ -7,6 +7,7 @@ import com.thepoofy.sample.features.main_activity.databinding.ContentScrollingBi
 import com.thepoofy.sample.lib.api.model.Restaurant
 import com.thepoofy.sample.lib.core.SchedulersModule
 import com.thepoofy.sample.lib.mvp.LifecyclePresenter
+import io.reactivex.rxjava3.subjects.BehaviorSubject
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -21,6 +22,8 @@ class MainActivityPresenter @Inject constructor(
 
     private var itemsLoaded = arrayListOf<Restaurant>()
 
+    private val isEnabledSubject = BehaviorSubject.createDefault(false)
+
     override fun onCreateView(binding: ContentScrollingBinding) {
         super.onCreateView(binding)
         view.onAttach(binding)
@@ -28,10 +31,22 @@ class MainActivityPresenter @Inject constructor(
     }
 
     override fun onResume() {
-        if (itemsLoaded.isEmpty()) {
-            view.showLoading()
-            requestRestaurants(INITIAL_OFFSET)
-        }
+        isEnabledSubject
+            .subscribeOn(schedulers.io())
+            .observeOn(schedulers.mainThread())
+            .autoDispose(scopeProvider)
+            .subscribe({ isEnabled ->
+                if (isEnabled) {
+                    view.show()
+
+                    if (itemsLoaded.isEmpty()) {
+                        view.showLoading()
+                        requestRestaurants(INITIAL_OFFSET)
+                    }
+                }
+            }, {
+                Timber.w(it)
+            })
 
         /*
         Note to reviewer: I was adding infinite scroll for *bonus points* when I realized the offset
@@ -42,6 +57,10 @@ class MainActivityPresenter @Inject constructor(
          */
 //        subscribeScrollEvents()
         subscribeClickEvents()
+    }
+
+    fun show() {
+        isEnabledSubject.onNext(true)
     }
 
     private fun requestRestaurants(offset: Int) {

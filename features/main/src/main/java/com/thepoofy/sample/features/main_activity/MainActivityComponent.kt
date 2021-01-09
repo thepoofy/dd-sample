@@ -1,5 +1,8 @@
 package com.thepoofy.sample.features.main_activity
 
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import androidx.lifecycle.Lifecycle
 import autodispose2.ScopeProvider
@@ -40,6 +43,11 @@ interface MainActivityComponent {
         @Provides
         @MainActivityScope
         fun lifecycle(activity: MainActivity): Lifecycle = activity.lifecycle
+
+        @Provides
+        @MainActivityScope
+        fun sharedPreferences(activity: MainActivity): SharedPreferences =
+            activity.getSharedPreferences("token_store", MODE_PRIVATE)
 
         @Provides
         @MainActivityScope

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:fitsSystemWindows="true"
     tools:context="com.thepoofy.sample.features.main_activity.MainActivity">
 
@@ -24,5 +25,9 @@
     <include
         android:id="@+id/scrolling_content"
         layout="@layout/content_scrolling" />
+
+    <include
+        android:id="@+id/login_content"
+        layout="@layout/content_login" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

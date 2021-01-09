@@ -61,6 +61,10 @@ class MainActivityPresenterViewImpl @Inject constructor(
         setIsVisible(false)
     }
 
+    override fun show() {
+        setIsVisible(true)
+    }
+
     override fun itemClicks(): Observable<Int> {
         return restaurantListAdapter.itemClickEvents()
     }
